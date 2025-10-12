@@ -46,7 +46,7 @@ export function PostPreview({ post }: PostPreviewProps) {
   }
 
   return (
-    <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-xl transition">
+    <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg dark:shadow-[0_0_30px_rgba(255,255,255,0.05)] border border-gray-100 dark:border-gray-800 overflow-hidden hover:shadow-xl dark:hover:shadow-[0_0_40px_rgba(255,255,255,0.08)] transition">
       <div className={`${platformInfo?.color} text-white px-6 py-4 flex items-center justify-between`}>
         <div className="flex items-center gap-3">
           {getPlatformIcon()}
@@ -66,15 +66,15 @@ export function PostPreview({ post }: PostPreviewProps) {
 
       <div className="p-6 space-y-4">
         <div className="prose prose-sm max-w-none">
-          <p className="text-gray-900 whitespace-pre-wrap leading-relaxed">{post.content}</p>
+          <p className="text-gray-900 dark:text-gray-100 whitespace-pre-wrap leading-relaxed">{post.content}</p>
         </div>
 
         {post.hashtags.length > 0 && (
-          <div className="flex flex-wrap gap-2 pt-4 border-t border-gray-100">
+          <div className="flex flex-wrap gap-2 pt-4 border-t border-gray-100 dark:border-gray-800">
             {post.hashtags.map((tag, idx) => (
               <span
                 key={idx}
-                className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-50 text-blue-700"
+                className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400"
               >
                 {tag}
               </span>
@@ -82,12 +82,12 @@ export function PostPreview({ post }: PostPreviewProps) {
           </div>
         )}
 
-        <div className="flex items-center justify-between pt-4 border-t border-gray-100 text-sm">
+        <div className="flex items-center justify-between pt-4 border-t border-gray-100 dark:border-gray-800 text-sm">
           <span className={`font-medium ${getCharacterColor()}`}>
             {post.character_count} / {platformInfo?.maxChars} characters
           </span>
           {copied && (
-            <span className="text-green-600 font-medium flex items-center gap-1">
+            <span className="text-green-600 dark:text-green-400 font-medium flex items-center gap-1">
               <Check className="w-4 h-4" />
               Copied!
             </span>

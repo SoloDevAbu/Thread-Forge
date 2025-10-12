@@ -1,7 +1,7 @@
 'use client'
 
-import { useState } from 'react'
-import { Upload, FileText, Sparkles } from 'lucide-react'
+import { useState, useRef } from 'react'
+import { Upload, Sparkles, ChevronDown, X } from 'lucide-react'
 import { PLATFORMS, TONES, FILE_TYPES } from '@/lib/constants'
 import { Platform, Tone } from '@/lib/types/database'
 
@@ -13,9 +13,10 @@ interface ContentInputProps {
     tones: Record<Platform, Tone>
   }) => void
   loading: boolean
+  user?: any
 }
 
-export function ContentInput({ onGenerate, loading }: ContentInputProps) {
+export function ContentInput({ onGenerate, loading, user }: ContentInputProps) {
   const [content, setContent] = useState('')
   const [file, setFile] = useState<File | null>(null)
   const [selectedPlatforms, setSelectedPlatforms] = useState<Platform[]>(['twitter', 'linkedin'])
@@ -24,6 +25,9 @@ export function ContentInput({ onGenerate, loading }: ContentInputProps) {
     linkedin: 'professional',
     reddit: 'casual',
   })
+  const [showPlatformDropdown, setShowPlatformDropdown] = useState(false)
+  const [showToneSelectors, setShowToneSelectors] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0]
@@ -58,122 +62,148 @@ export function ContentInput({ onGenerate, loading }: ContentInputProps) {
   }
 
   return (
-    <div className="w-full max-w-4xl mx-auto space-y-6">
-      <div className="bg-white rounded-2xl shadow-lg p-8 border border-gray-100">
-        <div className="space-y-6">
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-3">
-              Your Content
-            </label>
-            <textarea
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-              placeholder="Paste your long-form content here, or upload a file below..."
-              className="w-full h-48 px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition resize-none text-gray-900 placeholder-gray-400"
-              disabled={loading}
-            />
-          </div>
+    <div className="w-full max-w-4xl mx-auto">
+      <div className="relative">
+        <div className="bg-gray-50 dark:bg-[#0a0a0a] rounded-2xl border border-gray-300 dark:border-gray-900 shadow-[0_8px_30px_rgb(0,0,0,0.06)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.5)] hover:shadow-[0_8px_40px_rgb(0,0,0,0.08)] dark:hover:shadow-[0_8px_40px_rgba(0,0,0,0.6)] transition-all duration-300">
+          <textarea
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+            placeholder="Describe your content or paste it here..."
+            className="w-full h-48 px-6 py-4 bg-transparent text-gray-900 dark:text-gray-300 placeholder-gray-500 dark:placeholder-gray-700 outline-none resize-none rounded-t-2xl"
+            disabled={loading}
+          />
 
-          <div className="flex items-center gap-4">
-            <div className="flex-1 border-t border-gray-200"></div>
-            <span className="text-sm text-gray-500 font-medium">OR</span>
-            <div className="flex-1 border-t border-gray-200"></div>
-          </div>
+          {file && (
+            <div className="px-6 pb-2">
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 rounded-lg text-sm">
+                <span className="font-medium">{file.name}</span>
+                <button
+                  onClick={() => {
+                    setFile(null)
+                    setContent('')
+                  }}
+                  className="hover:text-blue-900 dark:hover:text-blue-300"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          )}
 
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-3">
-              Upload File
-            </label>
-            <div className="relative">
+          <div className="flex items-center justify-between px-6 py-4 border-t border-gray-300 dark:border-gray-900 bg-gray-100 dark:bg-[#050505] rounded-b-2xl">
+            <div className="flex items-center gap-3">
               <input
+                ref={fileInputRef}
                 type="file"
                 onChange={handleFileChange}
                 accept={`${FILE_TYPES.pdf.accept},${FILE_TYPES.excel.accept},${FILE_TYPES.csv.accept}`}
                 className="hidden"
-                id="file-upload"
                 disabled={loading}
               />
-              <label
-                htmlFor="file-upload"
-                className="flex items-center justify-center gap-3 w-full px-6 py-4 border-2 border-dashed border-gray-300 rounded-xl hover:border-blue-500 hover:bg-blue-50/50 transition cursor-pointer group"
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                className="p-2 hover:bg-gray-200 dark:hover:bg-gray-900 rounded-lg transition"
+                disabled={loading}
+                title="Upload file"
               >
-                <Upload className="w-5 h-5 text-gray-400 group-hover:text-blue-500 transition" />
-                <span className="text-gray-600 group-hover:text-blue-600 font-medium">
-                  {file ? file.name : 'Choose PDF, Excel, or CSV file'}
-                </span>
-              </label>
-            </div>
-          </div>
+                <Upload className="w-5 h-5 text-gray-600 dark:text-gray-500" />
+              </button>
 
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-3">
-              Select Platforms
-            </label>
-            <div className="flex flex-wrap gap-3">
-              {PLATFORMS.map((platform) => (
+              <div className="relative">
                 <button
-                  key={platform.value}
-                  onClick={() => handlePlatformToggle(platform.value)}
+                  onClick={() => setShowToneSelectors(!showToneSelectors)}
+                  className="px-3 py-2 text-sm font-medium text-gray-600 dark:text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-900 rounded-lg transition"
                   disabled={loading}
-                  className={`px-4 py-2 rounded-lg font-medium transition ${
-                    selectedPlatforms.includes(platform.value)
-                      ? `${platform.color} text-white`
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                  } disabled:opacity-50 disabled:cursor-not-allowed`}
                 >
-                  {platform.label}
+                  Tone
                 </button>
-              ))}
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <div className="relative">
+                <button
+                  onClick={() => setShowPlatformDropdown(!showPlatformDropdown)}
+                  className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-600 dark:text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-900 rounded-lg transition"
+                  disabled={loading}
+                >
+                  <span>Platforms ({selectedPlatforms.length})</span>
+                  <ChevronDown className="w-4 h-4" />
+                </button>
+
+                {showPlatformDropdown && (
+                  <div className="absolute right-0 bottom-full mb-2 w-64 bg-white dark:bg-[#0a0a0a] border border-gray-200 dark:border-gray-900 rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.8)] p-3 z-10">
+                    <div className="space-y-2">
+                      {PLATFORMS.map((platform) => (
+                        <label
+                          key={platform.value}
+                          className="flex items-center gap-3 p-2 hover:bg-gray-100 dark:hover:bg-gray-900 rounded-lg cursor-pointer transition"
+                        >
+                          <input
+                            type="checkbox"
+                            checked={selectedPlatforms.includes(platform.value)}
+                            onChange={() => handlePlatformToggle(platform.value)}
+                            className="w-4 h-4 rounded accent-blue-600"
+                            disabled={loading}
+                          />
+                          <span className="text-sm font-medium text-gray-700 dark:text-gray-400">
+                            {platform.label}
+                          </span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <button
+                onClick={handleSubmit}
+                disabled={loading || (!content.trim() && !file) || selectedPlatforms.length === 0}
+                className="px-6 py-2 bg-blue-600 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-700 text-white font-semibold rounded-xl transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 shadow-md hover:shadow-lg"
+              >
+                {loading ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    Generating...
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="w-4 h-4" />
+                    Generate
+                  </>
+                )}
+              </button>
             </div>
           </div>
 
-          <div className="space-y-4">
-            <label className="block text-sm font-semibold text-gray-700">
-              Select Tone for Each Platform
-            </label>
-            {selectedPlatforms.map((platform) => {
-              const platformInfo = PLATFORMS.find((p) => p.value === platform)
-              return (
-                <div key={platform} className="space-y-2">
-                  <label className="text-sm font-medium text-gray-600">
-                    {platformInfo?.label}
-                  </label>
-                  <select
-                    value={tones[platform]}
-                    onChange={(e) =>
-                      setTones((prev) => ({ ...prev, [platform]: e.target.value as Tone }))
-                    }
-                    disabled={loading}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition bg-white text-gray-900"
-                  >
-                    {TONES.map((tone) => (
-                      <option key={tone.value} value={tone.value}>
-                        {tone.label} - {tone.description}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              )
-            })}
-          </div>
-
-          <button
-            onClick={handleSubmit}
-            disabled={loading || (!content.trim() && !file) || selectedPlatforms.length === 0}
-            className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold py-4 rounded-xl transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 shadow-lg hover:shadow-xl"
-          >
-            {loading ? (
-              <>
-                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                Generating...
-              </>
-            ) : (
-              <>
-                <Sparkles className="w-5 h-5" />
-                Generate Viral Posts
-              </>
-            )}
-          </button>
+          {showToneSelectors && selectedPlatforms.length > 0 && (
+            <div className="px-6 pb-4 space-y-3 border-t border-gray-300 dark:border-gray-900 pt-4 bg-gray-100 dark:bg-[#050505]">
+              {selectedPlatforms.map((platform) => {
+                const platformInfo = PLATFORMS.find((p) => p.value === platform)
+                return (
+                  <div key={platform} className="flex items-center gap-4">
+                    <label className="text-sm font-medium text-gray-700 dark:text-gray-500 w-24">
+                      {platformInfo?.label}
+                    </label>
+                    <select
+                      value={tones[platform]}
+                      onChange={(e) =>
+                        setTones((prev) => ({ ...prev, [platform]: e.target.value as Tone }))
+                      }
+                      disabled={loading}
+                      className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-900 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition bg-white dark:bg-[#0a0a0a] text-gray-900 dark:text-gray-400 text-sm"
+                    >
+                      {TONES.map((tone) => (
+                        <option key={tone.value} value={tone.value}>
+                          {tone.label} - {tone.description}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )
+              })}
+            </div>
+          )}
         </div>
       </div>
     </div>
