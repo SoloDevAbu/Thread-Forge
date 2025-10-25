@@ -1,46 +1,39 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useSession } from 'next-auth/react'
 import { History, Search, Clock, X } from 'lucide-react'
 import { GenerationWithPosts } from '@/lib/types/database'
-import { createClient } from '@/lib/supabase/client'
 
 interface HistorySidebarProps {
   onSelectGeneration: (generation: GenerationWithPosts) => void
 }
 
 export function HistorySidebar({ onSelectGeneration }: HistorySidebarProps) {
+  const { data: session, status } = useSession()
   const [isOpen, setIsOpen] = useState(false)
   const [generations, setGenerations] = useState<GenerationWithPosts[]>([])
   const [searchQuery, setSearchQuery] = useState('')
   const [loading, setLoading] = useState(false)
 
-  const supabase = createClient()
-
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && session?.user) {
       loadGenerations()
     }
-  }, [isOpen])
+  }, [isOpen, session?.user])
 
   const loadGenerations = async () => {
+    if (!session?.user) return
+    
     setLoading(true)
     try {
-      const { data: user } = await supabase.auth.getUser()
-      if (!user.user) return
-
-      const { data, error } = await supabase
-        .from('generations')
-        .select(`
-          *,
-          generated_posts (*)
-        `)
-        .eq('user_id', user.user.id)
-        .order('created_at', { ascending: false })
-        .limit(50)
-
-      if (error) throw error
-      setGenerations(data as GenerationWithPosts[])
+      const response = await fetch('/api/generations')
+      if (!response.ok) {
+        throw new Error('Failed to fetch generations')
+      }
+      
+      const data = await response.json()
+      setGenerations(data)
     } catch (error) {
       console.error('Error loading generations:', error)
     } finally {
@@ -92,7 +85,14 @@ export function HistorySidebar({ onSelectGeneration }: HistorySidebarProps) {
           </div>
 
           <div className="flex-1 overflow-y-auto">
-            {loading ? (
+            {!session?.user ? (
+              <div className="flex flex-col items-center justify-center h-full text-gray-500 dark:text-gray-600 px-6">
+                <History className="w-12 h-12 mb-3 opacity-50" />
+                <p className="text-center">
+                  Sign in to view your generation history
+                </p>
+              </div>
+            ) : loading ? (
               <div className="flex items-center justify-center h-full">
                 <div className="w-8 h-8 border-4 border-blue-600 dark:border-blue-500 border-t-transparent rounded-full animate-spin"></div>
               </div>

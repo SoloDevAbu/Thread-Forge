@@ -1,17 +1,17 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useSession, signIn } from 'next-auth/react'
 import { ContentInput } from '@/components/content-input'
 import { PostPreview } from '@/components/post-preview'
 import { TopBar } from '@/components/top-bar'
 import { HistorySidebar } from '@/components/history-sidebar'
-import { createClient } from '@/lib/supabase/client'
 import { GeneratedPost, Platform, Tone, GenerationWithPosts } from '@/lib/types/database'
 import { parseFile } from '@/lib/file-parser'
 import { AuthDialog } from '@/components/auth-dialog'
 
 export default function Home() {
-  const [user, setUser] = useState<any>(null)
+  const { data: session, status } = useSession()
   const [showAuthDialog, setShowAuthDialog] = useState(false)
   const [generatedPosts, setGeneratedPosts] = useState<GeneratedPost[]>([])
   const [loading, setLoading] = useState(false)
@@ -23,21 +23,7 @@ export default function Home() {
     tones: Record<Platform, Tone>
   } | null>(null)
 
-  const supabase = createClient()
-
-  useEffect(() => {
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      setUser(user)
-    })
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null)
-    })
-
-    return () => subscription.unsubscribe()
-  }, [])
+  const user = session?.user
 
   const performGeneration = async (data: {
     content: string
@@ -93,7 +79,7 @@ export default function Home() {
     platforms: Platform[]
     tones: Record<Platform, Tone>
   }) => {
-    if (!user) {
+    if (!session?.user) {
       setPendingGeneration(data)
       setShowAuthDialog(true)
       return
@@ -108,17 +94,25 @@ export default function Home() {
     }
   }
 
-  const handleAuthSuccess = () => {
+  const handleAuthSuccess = async () => {
     setShowAuthDialog(false)
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      setUser(user)
-      
-      // Auto-generate if there's a pending generation
-      if (pendingGeneration) {
-        performGeneration(pendingGeneration)
-        setPendingGeneration(null)
-      }
-    })
+    
+    // Auto-generate if there's a pending generation
+    if (pendingGeneration) {
+      await performGeneration(pendingGeneration)
+      setPendingGeneration(null)
+    }
+  }
+
+  const handleSignIn = async () => {
+    try {
+      await signIn('google', { 
+        callbackUrl: window.location.href,
+        redirect: false 
+      })
+    } catch (error) {
+      console.error('Sign in error:', error)
+    }
   }
 
   return (

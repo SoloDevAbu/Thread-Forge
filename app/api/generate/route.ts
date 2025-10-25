@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { getServerSession } from 'next-auth'
+import { authOptions } from '@/lib/auth'
+import prisma from '@/lib/prisma'
 import { generateText } from 'ai'
 import { openai } from '@ai-sdk/openai'
 import { Platform, Tone } from '@/lib/types/database'
@@ -13,12 +15,9 @@ interface GenerateRequest {
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = await createClient()
-    const {
-      data: { user },
-    } = await supabase.auth.getUser()
+    const session = await getServerSession(authOptions)
 
-    if (!user) {
+    if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
@@ -29,20 +28,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
     }
 
-    const generationId = crypto.randomUUID()
-
-    const { error: genError } = await supabase.from('generations').insert({
-      id: generationId,
-      user_id: user.id,
-      original_content: content,
-      content_type: 'text',
-      platforms,
+    const generation = await prisma.generation.create({
+      data: {
+        userId: session.user.id,
+        originalContent: content,
+        contentType: 'text',
+        platforms,
+      },
     })
-
-    if (genError) {
-      console.error('Error creating generation:', genError)
-      return NextResponse.json({ error: 'Failed to save generation' }, { status: 500 })
-    }
 
     const generatedPosts = []
 
@@ -63,27 +56,34 @@ export async function POST(request: NextRequest) {
 
         const { postContent, hashtags } = parseGeneratedContent(text)
 
-        const post = {
-          generation_id: generationId,
-          platform,
-          tone,
-          content: postContent,
-          hashtags,
-          character_count: postContent.length,
-        }
+        const post = await prisma.generatedPost.create({
+          data: {
+            generationId: generation.id,
+            platform,
+            tone,
+            content: postContent,
+            hashtags,
+            characterCount: postContent.length,
+          },
+        })
 
-        const { error: postError } = await supabase.from('generated_posts').insert(post)
-
-        if (!postError) {
-          generatedPosts.push({ id: crypto.randomUUID(), ...post, created_at: new Date().toISOString() })
-        }
+        generatedPosts.push({
+          id: post.id,
+          generation_id: post.generationId,
+          platform: post.platform,
+          tone: post.tone,
+          content: post.content,
+          hashtags: post.hashtags,
+          character_count: post.characterCount,
+          created_at: post.createdAt.toISOString(),
+        })
       } catch (error) {
         console.error(`Error generating for ${platform}:`, error)
       }
     }
 
     return NextResponse.json({
-      generationId,
+      generationId: generation.id,
       posts: generatedPosts,
     })
   } catch (error) {
