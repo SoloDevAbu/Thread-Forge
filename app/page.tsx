@@ -116,19 +116,19 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-black transition-colors">
+    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white dark:bg-black transition-colors">
       <TopBar user={user} onAuthSuccess={handleAuthSuccess} />
       <HistorySidebar onSelectGeneration={handleSelectGeneration} />
 
       <div className="container mx-auto px-4 py-12 pt-28">
         <header className="text-center mb-16">
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-5 leading-tight">
+          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-5 leading-tight">
             Transform Content Into
             <br />
             Viral Social Posts
           </h1>
 
-          <p className="text-lg text-gray-600 dark:text-gray-500 max-w-2xl mx-auto">
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
             Convert your content into platform-optimized posts for Twitter, LinkedIn, and Reddit.
           </p>
         </header>

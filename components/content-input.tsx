@@ -64,25 +64,25 @@ export function ContentInput({ onGenerate, loading, user }: ContentInputProps) {
   return (
     <div className="w-full max-w-4xl mx-auto">
       <div className="relative">
-        <div className="bg-gray-50 dark:bg-[#0a0a0a] rounded-2xl border border-gray-300 dark:border-gray-900 shadow-[0_8px_30px_rgb(0,0,0,0.06)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.5)] hover:shadow-[0_8px_40px_rgb(0,0,0,0.08)] dark:hover:shadow-[0_8px_40px_rgba(0,0,0,0.6)] transition-all duration-300">
+        <div className="bg-gray-50 rounded-2xl border border-gray-300 shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:shadow-[0_8px_40px_rgb(0,0,0,0.08)] transition-all duration-300">
           <textarea
             value={content}
             onChange={(e) => setContent(e.target.value)}
             placeholder="Describe your content or paste it here..."
-            className="w-full h-48 px-6 py-4 bg-transparent text-gray-900 dark:text-gray-300 placeholder-gray-500 dark:placeholder-gray-700 outline-none resize-none rounded-t-2xl"
+            className="w-full h-48 px-6 py-4 bg-transparent text-gray-900 placeholder-gray-500 outline-none resize-none rounded-t-2xl"
             disabled={loading}
           />
 
           {file && (
             <div className="px-6 pb-2">
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 rounded-lg text-sm">
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-blue-50 text-blue-700 rounded-lg text-sm">
                 <span className="font-medium">{file.name}</span>
                 <button
                   onClick={() => {
                     setFile(null)
                     setContent('')
                   }}
-                  className="hover:text-blue-900 dark:hover:text-blue-300"
+                  className="hover:text-blue-900"
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -90,7 +90,7 @@ export function ContentInput({ onGenerate, loading, user }: ContentInputProps) {
             </div>
           )}
 
-          <div className="flex items-center justify-between px-6 py-4 border-t border-gray-300 dark:border-gray-900 bg-gray-100 dark:bg-[#050505] rounded-b-2xl">
+          <div className="flex items-center justify-between px-6 py-4 border-t border-gray-300 bg-gray-100 rounded-b-2xl">
             <div className="flex items-center gap-3">
               <input
                 ref={fileInputRef}
@@ -102,17 +102,17 @@ export function ContentInput({ onGenerate, loading, user }: ContentInputProps) {
               />
               <button
                 onClick={() => fileInputRef.current?.click()}
-                className="p-2 hover:bg-gray-200 dark:hover:bg-gray-900 rounded-lg transition"
+                className="p-2 hover:bg-gray-200 rounded-lg transition"
                 disabled={loading}
                 title="Upload file"
               >
-                <Upload className="w-5 h-5 text-gray-600 dark:text-gray-500" />
+                <Upload className="w-5 h-5 text-gray-600" />
               </button>
 
               <div className="relative">
                 <button
                   onClick={() => setShowToneSelectors(!showToneSelectors)}
-                  className="px-3 py-2 text-sm font-medium text-gray-600 dark:text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-900 rounded-lg transition"
+                  className="px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-200 rounded-lg transition"
                   disabled={loading}
                 >
                   Tone
@@ -124,7 +124,7 @@ export function ContentInput({ onGenerate, loading, user }: ContentInputProps) {
               <div className="relative">
                 <button
                   onClick={() => setShowPlatformDropdown(!showPlatformDropdown)}
-                  className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-600 dark:text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-900 rounded-lg transition"
+                  className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-200 rounded-lg transition"
                   disabled={loading}
                 >
                   <span>Platforms ({selectedPlatforms.length})</span>
@@ -132,12 +132,12 @@ export function ContentInput({ onGenerate, loading, user }: ContentInputProps) {
                 </button>
 
                 {showPlatformDropdown && (
-                  <div className="absolute right-0 bottom-full mb-2 w-64 bg-white dark:bg-[#0a0a0a] border border-gray-200 dark:border-gray-900 rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.8)] p-3 z-10">
+                  <div className="absolute right-0 bottom-full mb-2 w-64 bg-white border border-gray-200 rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] p-3 z-10">
                     <div className="space-y-2">
                       {PLATFORMS.map((platform) => (
                         <label
                           key={platform.value}
-                          className="flex items-center gap-3 p-2 hover:bg-gray-100 dark:hover:bg-gray-900 rounded-lg cursor-pointer transition"
+                          className="flex items-center gap-3 p-2 hover:bg-gray-100 rounded-lg cursor-pointer transition"
                         >
                           <input
                             type="checkbox"
@@ -146,7 +146,7 @@ export function ContentInput({ onGenerate, loading, user }: ContentInputProps) {
                             className="w-4 h-4 rounded accent-blue-600"
                             disabled={loading}
                           />
-                          <span className="text-sm font-medium text-gray-700 dark:text-gray-400">
+                          <span className="text-sm font-medium text-gray-700">
                             {platform.label}
                           </span>
                         </label>
@@ -159,7 +159,7 @@ export function ContentInput({ onGenerate, loading, user }: ContentInputProps) {
               <button
                 onClick={handleSubmit}
                 disabled={loading || (!content.trim() && !file) || selectedPlatforms.length === 0}
-                className="px-6 py-2 bg-blue-600 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-700 text-white font-semibold rounded-xl transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 shadow-md hover:shadow-lg"
+                className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 shadow-md hover:shadow-lg"
               >
                 {loading ? (
                   <>
@@ -177,12 +177,12 @@ export function ContentInput({ onGenerate, loading, user }: ContentInputProps) {
           </div>
 
           {showToneSelectors && selectedPlatforms.length > 0 && (
-            <div className="px-6 pb-4 space-y-3 border-t border-gray-300 dark:border-gray-900 pt-4 bg-gray-100 dark:bg-[#050505]">
+            <div className="px-6 pb-4 space-y-3 border-t border-gray-300 pt-4 bg-gray-100">
               {selectedPlatforms.map((platform) => {
                 const platformInfo = PLATFORMS.find((p) => p.value === platform)
                 return (
                   <div key={platform} className="flex items-center gap-4">
-                    <label className="text-sm font-medium text-gray-700 dark:text-gray-500 w-24">
+                    <label className="text-sm font-medium text-gray-700 w-24">
                       {platformInfo?.label}
                     </label>
                     <select
@@ -191,7 +191,7 @@ export function ContentInput({ onGenerate, loading, user }: ContentInputProps) {
                         setTones((prev) => ({ ...prev, [platform]: e.target.value as Tone }))
                       }
                       disabled={loading}
-                      className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-900 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition bg-white dark:bg-[#0a0a0a] text-gray-900 dark:text-gray-400 text-sm"
+                      className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition bg-white text-gray-900 text-sm"
                     >
                       {TONES.map((tone) => (
                         <option key={tone.value} value={tone.value}>

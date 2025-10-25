@@ -12,24 +12,22 @@ interface TopBarProps {
 export function TopBar({ user, onAuthSuccess }: TopBarProps) {
   const [showAuthDialog, setShowAuthDialog] = useState(false)
   const [isDark, setIsDark] = useState(true)
+  const [isScrolled, setIsScrolled] = useState(false)
 
   useEffect(() => {
     // Check initial theme state
     const htmlElement = document.documentElement
     setIsDark(htmlElement.classList.contains('dark'))
-  }, [])
 
-  const toggleTheme = () => {
-    const htmlElement = document.documentElement
-    const newIsDark = !isDark
-    setIsDark(newIsDark)
-    
-    if (newIsDark) {
-      htmlElement.classList.add('dark')
-    } else {
-      htmlElement.classList.remove('dark')
+    // Handle scroll detection
+    const handleScroll = () => {
+      const scrollTop = window.scrollY
+      setIsScrolled(scrollTop > 10)
     }
-  }
+
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
 
   const getUserInitials = (user: any) => {
     if (!user) return ''
@@ -39,9 +37,13 @@ export function TopBar({ user, onAuthSuccess }: TopBarProps) {
 
   return (
     <>
-      <div className="fixed top-0 left-0 right-0 z-50 bg-white dark:bg-black border-b border-gray-200 dark:border-gray-800 shadow-sm">
+      <div className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        isScrolled 
+          ? 'bg-blue-50/80 dark:bg-black/80 backdrop-blur-sm border-b border-blue-100 dark:border-gray-800 shadow-sm hover:bg-blue-50/60 dark:hover:bg-black/60 my-1 mx-2 rounded-lg' 
+          : 'bg-blue-50/0 dark:bg-black/0 border-b border-transparent'
+      }`}>
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-          <div className="text-xl font-bold text-gray-900 dark:text-white">
+          <div className="text-xl font-bold text-gray-800">
             ThreadForge
           </div>
 
@@ -54,7 +56,7 @@ export function TopBar({ user, onAuthSuccess }: TopBarProps) {
               <div className="flex items-center gap-3">
                 <button
                   onClick={() => setShowAuthDialog(true)}
-                  className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition"
+                  className="px-4 py-2 text-sm font-medium text-gray-800 hover:text-gray-900 transition"
                 >
                   Log In
                 </button>
@@ -66,18 +68,6 @@ export function TopBar({ user, onAuthSuccess }: TopBarProps) {
                 </button>
               </div>
             )}
-
-            <button
-              onClick={toggleTheme}
-              className="w-10 h-10 rounded-lg bg-gray-100 dark:bg-gray-900 hover:bg-gray-200 dark:hover:bg-gray-800 flex items-center justify-center transition"
-              aria-label="Toggle theme"
-            >
-              {isDark ? (
-                <Sun className="w-5 h-5 text-gray-700 dark:text-gray-300" />
-              ) : (
-                <Moon className="w-5 h-5 text-gray-700 dark:text-gray-300" />
-              )}
-            </button>
           </div>
         </div>
       </div>
