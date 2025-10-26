@@ -39,8 +39,8 @@ export function TopBar({ user, onAuthSuccess }: TopBarProps) {
     <>
       <div className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         isScrolled 
-          ? 'bg-blue-50/80 dark:bg-black/80 backdrop-blur-sm border-b border-blue-100 dark:border-gray-800 shadow-sm hover:bg-blue-50/60 dark:hover:bg-black/60 my-1 mx-2 rounded-lg' 
-          : 'bg-blue-50/0 dark:bg-black/0 border-b border-transparent'
+          ? 'bg-blue-50/80 backdrop-blur-sm border-b border-blue-100 shadow-sm hover:bg-blue-50/60 my-2 mx-4 rounded-3xl' 
+          : 'bg-blue-50/0 border-b border-transparent'
       }`}>
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <div className="text-xl font-bold text-gray-800">
