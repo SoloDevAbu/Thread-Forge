@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Copy, Check, Heart, MessageCircle, Share, MoreHorizontal } from 'lucide-react'
+import { Copy, Check, ThumbsUp, MessageCircle, Share, Send, MoreHorizontal, Earth, ShieldCheck } from 'lucide-react'
 import { GeneratedPost } from '@/lib/types/database'
 
 interface LinkedInCardProps {
@@ -19,9 +19,30 @@ export function LinkedInCard({ post }: LinkedInCardProps) {
 
   const getDummyUser = () => {
     const users = [
-      { name: 'Michael Johnson', title: 'Senior Marketing Manager', company: 'TechCorp', avatar: 'MJ' },
-      { name: 'Lisa Wang', title: 'Product Director', company: 'InnovateLab', avatar: 'LW' },
-      { name: 'David Chen', title: 'CEO & Founder', company: 'StartupXYZ', avatar: 'DC' },
+      { 
+        name: 'John', 
+        title: "social media manager & video editor", 
+        avatar: 'PA',
+        verified: true,
+        connection: '1st',
+        timeAgo: '1yr'
+      },
+      { 
+        name: 'Michael Johnson', 
+        title: 'Senior Marketing Manager at TechCorp', 
+        avatar: 'MJ',
+        verified: false,
+        connection: '2nd',
+        timeAgo: '2mo'
+      },
+      { 
+        name: 'Lisa Wang', 
+        title: 'Product Director at InnovateLab', 
+        avatar: 'LW',
+        verified: true,
+        connection: '1st',
+        timeAgo: '3mo'
+      },
     ]
     return users[Math.floor(Math.random() * users.length)]
   }
@@ -29,43 +50,55 @@ export function LinkedInCard({ post }: LinkedInCardProps) {
   const dummyUser = getDummyUser()
 
   return (
-    <div className="bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden hover:shadow-xl transition">
-      <div className="p-4 space-y-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
+    <div className="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-sm transition">
+      <div className="p-4 space-y-3">
+        {/* Header Section */}
+        <div className="flex items-start justify-between">
+          <div className="flex items-start gap-3">
             <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-blue-800 rounded-full flex items-center justify-center text-white font-semibold">
               {dummyUser.avatar}
             </div>
-            <div>
-              <h4 className="font-semibold text-gray-900">{dummyUser.name}</h4>
-              <p className="text-sm text-gray-600">{dummyUser.title}</p>
-              <p className="text-xs text-gray-500">{dummyUser.company}</p>
+            <div className="flex flex-col">
+              <div className="flex items-center gap-1">
+                <h4 className="font-semibold text-gray-900 text-sm">{dummyUser.name}</h4>
+                {dummyUser.verified && (
+                  <ShieldCheck
+                    className="w-4 h-4 text-gray-600"
+                  />
+                )}
+                <span className="text-gray-500 text-sm">• {dummyUser.connection}</span>
+              </div>
+              <p className="text-xs text-gray-600">{dummyUser.title}</p>
+              <div className="flex items-center gap-1 text-xs text-gray-500">
+                <span>{dummyUser.timeAgo}</span>
+                <span>•</span>
+                <Earth className="w-3 h-3" />
+              </div>
             </div>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1">
             <button
               onClick={handleCopy}
-              className="p-2 hover:bg-gray-100 rounded-full transition"
+              className="p-1.5 hover:bg-gray-100 rounded-full transition"
               title="Copy to clipboard"
             >
               {copied ? <Check className="w-4 h-4 text-green-600" /> : <Copy className="w-4 h-4 text-gray-600" />}
             </button>
-            <button className="p-2 hover:bg-gray-100 rounded-full transition">
-              <MoreHorizontal className="w-4 h-4 text-gray-600" />
-            </button>
           </div>
         </div>
 
-        <div className="text-gray-900 leading-relaxed whitespace-pre-wrap">
+        {/* Content Section */}
+        <div className="text-gray-900 text-sm leading-relaxed whitespace-pre-wrap">
           {post.content}
         </div>
 
+        {/* Hashtags */}
         {post.hashtags.length > 0 && (
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-1">
             {post.hashtags.map((tag, idx) => (
               <span
                 key={idx}
-                className="inline-flex items-center px-2 py-1 rounded-full text-sm font-medium bg-blue-50 text-blue-700 hover:bg-blue-100 transition"
+                className="text-blue-600 hover:text-blue-800 cursor-pointer text-sm"
               >
                 #{tag}
               </span>
@@ -73,30 +106,48 @@ export function LinkedInCard({ post }: LinkedInCardProps) {
           </div>
         )}
 
-        <div className="flex items-center justify-between pt-3 border-t border-gray-100">
-          <div className="flex items-center gap-6">
-            <button className="flex items-center gap-2 text-gray-600 hover:text-blue-600 transition">
-              <Heart className="w-5 h-5" />
-              <span className="text-sm">{Math.floor(Math.random() * 100) + 1}</span>
-            </button>
-            <button className="flex items-center gap-2 text-gray-600 hover:text-blue-600 transition">
-              <MessageCircle className="w-5 h-5" />
-              <span className="text-sm">{Math.floor(Math.random() * 30) + 1}</span>
-            </button>
-            <button className="flex items-center gap-2 text-gray-600 hover:text-blue-600 transition">
-              <Share className="w-5 h-5" />
-              <span className="text-sm">{Math.floor(Math.random() * 15) + 1}</span>
-            </button>
+        {/* Engagement Summary */}
+        <div className="flex items-center justify-between text-xs text-gray-500 border-b border-gray-200 pb-2">
+          <div className="flex items-center gap-1">
+            <div className="flex -space-x-1">
+              <div className="w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center">
+                <ThumbsUp className="w-2 h-2 text-white" />
+              </div>
+              <div className="w-4 h-4 bg-green-500 rounded-full flex items-center justify-center">
+                <svg className="w-2 h-2 text-white" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                </svg>
+              </div>
+            </div>
+            <span>{Math.floor(Math.random() * 10) + 1}</span>
           </div>
-          
-          <span className="text-xs text-gray-400">
-            {post.character_count}/3000
-          </span>
+          <span>{Math.floor(Math.random() * 5) + 1} comment</span>
         </div>
 
+        {/* Action Buttons */}
+        <div className="flex items-center justify-between">
+          <button className="flex items-center gap-1 text-gray-600 hover:text-blue-600 transition py-2 px-3 rounded-md hover:bg-gray-50">
+            <ThumbsUp className="w-4 h-4" />
+            <span className="text-sm font-medium">Like</span>
+          </button>
+          <button className="flex items-center gap-1 text-gray-600 hover:text-blue-600 transition py-2 px-3 rounded-md hover:bg-gray-50">
+            <MessageCircle className="w-4 h-4" />
+            <span className="text-sm font-medium">Comment</span>
+          </button>
+          <button className="flex items-center gap-1 text-gray-600 hover:text-blue-600 transition py-2 px-3 rounded-md hover:bg-gray-50">
+            <Share className="w-4 h-4" />
+            <span className="text-sm font-medium">Repost</span>
+          </button>
+          <button className="flex items-center gap-1 text-gray-600 hover:text-blue-600 transition py-2 px-3 rounded-md hover:bg-gray-50">
+            <Send className="w-4 h-4" />
+            <span className="text-sm font-medium">Send</span>
+          </button>
+        </div>
+
+        {/* Copy confirmation */}
         {copied && (
-          <div className="text-center text-green-600 font-medium flex items-center justify-center gap-1 text-sm">
-            <Check className="w-4 h-4" />
+          <div className="text-center text-green-600 font-medium flex items-center justify-center gap-1 text-xs">
+            <Check className="w-3 h-3" />
             Copied to clipboard!
           </div>
         )}
