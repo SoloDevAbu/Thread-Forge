@@ -226,7 +226,7 @@ export default function Home() {
                   <h3 className="text-xl font-bold text-gray-900">{platform.label}</h3>
                 </div>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className={`grid gap-6 ${platform.value === 'reddit' ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'}`}>
                   {platformPosts.map((post) => (
                     <PostPreview key={post.id} post={post} />
                   ))}
