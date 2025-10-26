@@ -3,7 +3,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/prisma'
 import { generateText } from 'ai'
-import { openai } from '@ai-sdk/openai'
+import { google } from '@ai-sdk/google'
 import { Platform, Tone } from '@/lib/types/database'
 import { PLATFORMS } from '@/lib/constants'
 
@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
 
       try {
         const { text } = await generateText({
-          model: openai('gpt-4-turbo-preview'),
+          model: google('gemini-1.5-flash'),
           prompt,
           temperature: 0.7,
         })
