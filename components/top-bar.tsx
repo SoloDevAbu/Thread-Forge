@@ -11,15 +11,9 @@ interface TopBarProps {
 
 export function TopBar({ user, onAuthSuccess }: TopBarProps) {
   const [showAuthDialog, setShowAuthDialog] = useState(false);
-  const [isDark, setIsDark] = useState(true);
   const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
-    // Check initial theme state
-    const htmlElement = document.documentElement;
-    setIsDark(htmlElement.classList.contains("dark"));
-
-    // Handle scroll detection
     const handleScroll = () => {
       const scrollTop = window.scrollY;
       setIsScrolled(scrollTop > 10);
@@ -66,15 +60,9 @@ export function TopBar({ user, onAuthSuccess }: TopBarProps) {
               <div className="flex items-center gap-3">
                 <button
                   onClick={() => setShowAuthDialog(true)}
-                  className="px-4 py-2 text-sm font-medium text-gray-800 hover:text-gray-900 transition"
-                >
-                  Log In
-                </button>
-                <button
-                  onClick={() => setShowAuthDialog(true)}
                   className="px-4 py-2 text-sm font-medium bg-gray-900 dark:bg-white text-white dark:text-black rounded-lg hover:shadow-lg transition"
                 >
-                  Sign Up
+                  Sign In
                 </button>
               </div>
             )}

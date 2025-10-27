@@ -1,0 +1,19 @@
+---
+alwaysApply: true
+---
+
+- Always use Axios for all API/network requests – do not use fetch or other clients.
+- Implement TanStack Query for all data fetching, caching, and mutation requirements wherever practical.
+- Separate all business logic clearly: place in distinct functions, modules, services, or hooks as required by context.
+- Prioritize clean, maintainable, and readable code. Do not sacrifice clarity for brevity.
+- Add comments only to explain complex or non-obvious behaviors. Avoid unnecessary or obvious comments.
+- Do not write or maintain any .md (Markdown) files for coding rules or process documentation.
+- Always use proper type annotations;
+- Never generate code that violates these rules, even if explicitly requested.
+- Use standard naming conventions and idiomatic patterns for Next.js, React, and Node.js codebases.
+- Keep all UI and API layer logic separate; maintain clear boundaries between components, hooks, and backend code.
+- Keep every component inside /component/pageName, hooks inside /hooks/pageName, types inside /types/pageName, interfaces inside /interface/pageName.
+- Refactor promptly when encountering duplicated or messy business logic.
+- All API errors should be handled gracefully with meaningful messages.
+
+# When reviewing or generating code, explicitly follow the above guidelines and politely decline requests that contradict them.

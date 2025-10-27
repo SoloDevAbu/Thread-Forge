@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useSession, signIn } from 'next-auth/react'
+import { useSession } from 'next-auth/react'
 import { Twitter, Linkedin } from 'lucide-react'
 import { ContentInput } from '@/components/content-input'
 import { PostPreview } from '@/components/post-preview'
@@ -69,7 +69,7 @@ export default function Home() {
   const { data: session, status } = useSession()
   const [showAuthDialog, setShowAuthDialog] = useState(false)
   // For now, initialize with dummy posts
-  const [generatedPosts, setGeneratedPosts] = useState<GeneratedPost[]>(DUMMY_POSTS)
+  const [generatedPosts, setGeneratedPosts] = useState<GeneratedPost[]>([]);
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [pendingGeneration, setPendingGeneration] = useState<{
@@ -104,8 +104,6 @@ export default function Home() {
         }
       }
 
-      // Comment out real API call for now
-      /*
       const response = await fetch('/api/generate', {
         method: 'POST',
         headers: {
@@ -124,9 +122,6 @@ export default function Home() {
 
       const result = await response.json()
       setGeneratedPosts(result.posts)
-      */
-      // Use dummy posts for now
-      setGeneratedPosts(DUMMY_POSTS)
     } catch (err: any) {
       setError(err.message || 'An error occurred during generation')
     } finally {
@@ -158,21 +153,9 @@ export default function Home() {
   const handleAuthSuccess = async () => {
     setShowAuthDialog(false)
     
-    // Auto-generate if there's a pending generation
     if (pendingGeneration) {
       await performGeneration(pendingGeneration)
       setPendingGeneration(null)
-    }
-  }
-
-  const handleSignIn = async () => {
-    try {
-      await signIn('google', { 
-        callbackUrl: window.location.href,
-        redirect: false 
-      })
-    } catch (error) {
-      console.error('Sign in error:', error)
     }
   }
 
@@ -202,6 +185,7 @@ export default function Home() {
           </div>
         )}
 
+        {generatedPosts.length > 0 && (
         <div className="mt-16 max-w-6xl mx-auto mb-12">
           <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-8 text-center">
             Your Viral Posts
@@ -235,6 +219,7 @@ export default function Home() {
             )
           })}
         </div>
+        )}
       </div>
 
       <AuthDialog
