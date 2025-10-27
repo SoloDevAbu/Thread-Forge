@@ -96,7 +96,7 @@ export function ContentInput({ onGenerate, loading, user }: ContentInputProps) {
                 ref={fileInputRef}
                 type="file"
                 onChange={handleFileChange}
-                accept={`${FILE_TYPES.pdf.accept},${FILE_TYPES.excel.accept},${FILE_TYPES.csv.accept}`}
+                accept={`${FILE_TYPES.pdf.accept},`}
                 className="hidden"
                 disabled={loading}
               />

@@ -1,6 +1,6 @@
 export type Platform = 'twitter' | 'linkedin' | 'reddit'
 
-export type Tone = 'educational' | 'professional' | 'funny' | 'inspirational' | 'controversial' | 'casual'
+export type Tone = 'educational' | 'professional' | 'funny' | 'inspirational' | 'casual'
 
 export type ContentType = 'text' | 'pdf' | 'excel' | 'csv' | 'google_sheets'
 
@@ -26,13 +26,10 @@ export interface Generation {
 
 export interface GeneratedPost {
   id: string
-  generation_id: string
   platform: Platform
   tone: Tone
   content: string
   hashtags: string[]
-  character_count: number
-  created_at: string
 }
 
 export interface UserPreferences {

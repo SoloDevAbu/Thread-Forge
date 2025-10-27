@@ -14,43 +14,31 @@ import { PLATFORMS } from '@/lib/constants'
 
 const DUMMY_POSTS: GeneratedPost[] = [
   {
-    id: '1',
-    generation_id: '1',
+      id: '1',
     content: "🔥 Unleash your content's potential! Turn blogs into viral tweets with ThreadForge.",
     platform: 'twitter',
     hashtags: ['ContentCreation', 'ViralPosts'],
-    character_count: 100,
-    created_at: new Date().toISOString(),
     tone: 'educational',
   },
   {
     id: '2',
-    generation_id: '2',
     content: "🔥 Unleash your content's potential! Turn blogs into viral tweets with ThreadForge.",
     platform: 'twitter',
     hashtags: ['ContentCreation', 'ViralPosts'],
-    character_count: 100,
-    created_at: new Date().toISOString(),
     tone: 'educational',
   },
   {
     id: '3',
-    generation_id: '3',
     content: "Wondering how to adapt content for LinkedIn audiences? With ThreadForge, optimize for every platform 🤩 Try it free today!",
     platform: 'linkedin',
-    hashtags: ['ContentCreation', 'ViralPosts'],
-    character_count: 100,
-    created_at: new Date().toISOString(),
+    hashtags: ['ContentCreation', 'ViralPosts'],  
     tone: 'educational',
   },
   {
     id: '4',
-    generation_id: '4',
     content: "Reddit tip: Sharing knowledge is easy when your posts are tailored. Use ThreadForge to engage, inform, and get upvotes!",
     platform: 'linkedin',
     hashtags: ['ContentCreation', 'ViralPosts'],
-    character_count: 100,
-    created_at: new Date().toISOString(),
     tone: 'professional',
   },
   {
@@ -58,10 +46,7 @@ const DUMMY_POSTS: GeneratedPost[] = [
     content: "Reddit tip: Sharing knowledge is easy when your posts are tailored. Use ThreadForge to engage, inform, and get upvotes!",
     platform: 'reddit',
     hashtags: ['ContentCreation', 'ViralPosts'],
-    character_count: 100,
-    created_at: new Date().toISOString(),
     tone: 'casual',
-    generation_id: '5',
   },
 ];
 
@@ -92,17 +77,6 @@ export default function Home() {
     setGeneratedPosts([])
 
     try {
-      let contentToGenerate = data.content
-
-      if (data.file) {
-        try {
-          contentToGenerate = await parseFile(data.file)
-        } catch (err) {
-          setError('Failed to parse file. Please try with text content.')
-          setLoading(false)
-          return
-        }
-      }
 
       const response = await fetch('/api/generate', {
         method: 'POST',
@@ -110,11 +84,14 @@ export default function Home() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          content: contentToGenerate,
+          content: data.content,
+          pdfFile: data?.file,
           platforms: data.platforms,
           tones: data.tones,
         }),
       })
+
+      console.log("response", response);
 
       if (!response.ok) {
         throw new Error('Failed to generate content')
