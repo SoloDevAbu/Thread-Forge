@@ -178,7 +178,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white dark:bg-black transition-colors">
-      <TopBar user={user} onAuthSuccess={handleAuthSuccess} />
+      <TopBar user={user || null} onAuthSuccess={handleAuthSuccess} />
       <HistorySidebar onSelectGeneration={handleSelectGeneration} />
 
       <div className="container mx-auto px-4 py-12 pt-28">
