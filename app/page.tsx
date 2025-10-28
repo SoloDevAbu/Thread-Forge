@@ -1,9 +1,9 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useSession } from 'next-auth/react'
 import { Twitter, Linkedin } from 'lucide-react'
-import { ContentInput } from '@/components/content-input'
+import { ContentInput, ContentInputRef } from '@/components/content-input'
 import { PostPreview } from '@/components/post-preview'
 import { TopBar } from '@/components/top-bar'
 import { HistorySidebar } from '@/components/history-sidebar'
@@ -56,7 +56,10 @@ export default function Home() {
   // For now, initialize with dummy posts
   const [generatedPosts, setGeneratedPosts] = useState<GeneratedPost[]>([]);
   const [loading, setLoading] = useState(false)
+  const [loadingPlatforms, setLoadingPlatforms] = useState<Platform[]>([])
   const [error, setError] = useState<string | null>(null)
+  const contentInputRef = useRef<ContentInputRef>(null)
+  const resultsRef = useRef<HTMLDivElement>(null)
   const [pendingGeneration, setPendingGeneration] = useState<{
     content: string
     file?: File
@@ -73,11 +76,11 @@ export default function Home() {
     tones: Record<Platform, Tone>
   }) => {
     setLoading(true)
+    setLoadingPlatforms(data.platforms)
     setError(null)
     setGeneratedPosts([])
 
     try {
-
       const response = await fetch('/api/generate', {
         method: 'POST',
         headers: {
@@ -91,18 +94,26 @@ export default function Home() {
         }),
       })
 
-      console.log("response", response);
-
       if (!response.ok) {
         throw new Error('Failed to generate content')
       }
 
       const result = await response.json()
       setGeneratedPosts(result.posts)
+      
+      // Clear input and scroll to results on success
+      contentInputRef.current?.clearInput()
+      setTimeout(() => {
+        resultsRef.current?.scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'start' 
+        })
+      }, 100)
     } catch (err: any) {
       setError(err.message || 'An error occurred during generation')
     } finally {
       setLoading(false)
+      setLoadingPlatforms([])
     }
   }
 
@@ -117,6 +128,14 @@ export default function Home() {
       setShowAuthDialog(true)
       return
     }
+
+    // Scroll to results area immediately for better UX
+    setTimeout(() => {
+      resultsRef.current?.scrollIntoView({ 
+        behavior: 'smooth', 
+        block: 'start' 
+      })
+    }, 100)
 
     await performGeneration(data)
   }
@@ -154,7 +173,7 @@ export default function Home() {
           </p>
         </header>
 
-        <ContentInput onGenerate={handleGenerate} loading={loading} user={user} />
+        <ContentInput ref={contentInputRef} onGenerate={handleGenerate} loading={loading} user={user} />
 
         {error && (
           <div className="max-w-4xl mx-auto mt-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl text-red-700 dark:text-red-400">
@@ -162,15 +181,17 @@ export default function Home() {
           </div>
         )}
 
-        {generatedPosts.length > 0 && (
-        <div className="mt-16 max-w-6xl mx-auto mb-12">
+        {(generatedPosts.length > 0 || loadingPlatforms.length > 0) && (
+        <div ref={resultsRef} className="mt-16 max-w-6xl mx-auto mb-12">
           <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-8 text-center">
             Your Viral Posts
           </h2>
           
           {PLATFORMS.map((platform) => {
             const platformPosts = generatedPosts.filter(post => post.platform === platform.value)
-            if (platformPosts.length === 0) return null
+            const isLoading = loadingPlatforms.includes(platform.value)
+            
+            if (platformPosts.length === 0 && !isLoading) return null
             
             return (
               <div key={platform.value} className="mb-12">
@@ -185,12 +206,35 @@ export default function Home() {
                     )} */}
                   </div>
                   <h3 className="text-xl font-bold text-gray-900">{platform.label}</h3>
+                  {isLoading && (
+                    <div className="flex items-center gap-2 text-sm text-gray-500">
+                      <div className="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                      <span>Generating...</span>
+                    </div>
+                  )}
                 </div>
                 
                 <div className={`grid gap-6 ${platform.value === 'reddit' ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'}`}>
-                  {platformPosts.map((post) => (
-                    <PostPreview key={post.id} post={post} />
-                  ))}
+                  {isLoading ? (
+                    // Skeleton loading cards
+                    Array.from({ length: 3 }).map((_, idx) => (
+                      <div key={idx} className="bg-white border border-gray-200 rounded-lg p-4 animate-pulse">
+                        <div className="space-y-3">
+                          <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                          <div className="h-4 bg-gray-200 rounded w-full"></div>
+                          <div className="h-4 bg-gray-200 rounded w-5/6"></div>
+                          <div className="flex gap-2">
+                            <div className="h-3 bg-gray-200 rounded w-16"></div>
+                            <div className="h-3 bg-gray-200 rounded w-20"></div>
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    platformPosts.map((post) => (
+                      <PostPreview key={post.id} post={post} />
+                    ))
+                  )}
                 </div>
               </div>
             )

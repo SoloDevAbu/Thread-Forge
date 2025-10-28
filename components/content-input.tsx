@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect, useImperativeHandle, forwardRef } from 'react'
 import { Upload, Sparkles, ChevronDown, X } from 'lucide-react'
 import { PLATFORMS, TONES, FILE_TYPES } from '@/lib/constants'
 import { Platform, Tone } from '@/lib/types/database'
@@ -16,7 +16,11 @@ interface ContentInputProps {
   user?: any
 }
 
-export function ContentInput({ onGenerate, loading, user }: ContentInputProps) {
+export interface ContentInputRef {
+  clearInput: () => void
+}
+
+export const ContentInput = forwardRef<ContentInputRef, ContentInputProps>(({ onGenerate, loading, user }, ref) => {
   const [content, setContent] = useState('')
   const [file, setFile] = useState<File | null>(null)
   const [selectedPlatforms, setSelectedPlatforms] = useState<Platform[]>(['twitter', 'linkedin'])
@@ -43,6 +47,14 @@ export function ContentInput({ onGenerate, loading, user }: ContentInputProps) {
     )
   }
 
+  const clearInput = () => {
+    setContent('')
+    setFile(null)
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ''
+    }
+  }
+
   const handleSubmit = () => {
     if ((!content.trim() && !file) || selectedPlatforms.length === 0) {
       return
@@ -60,6 +72,10 @@ export function ContentInput({ onGenerate, loading, user }: ContentInputProps) {
       tones: selectedTones,
     })
   }
+
+  useImperativeHandle(ref, () => ({
+    clearInput
+  }))
 
   return (
     <div className="w-full max-w-4xl mx-auto">
@@ -208,4 +224,4 @@ export function ContentInput({ onGenerate, loading, user }: ContentInputProps) {
       </div>
     </div>
   )
-}
+})
