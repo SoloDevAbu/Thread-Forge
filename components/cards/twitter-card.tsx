@@ -12,7 +12,8 @@ export function TwitterCard({ post }: TwitterCardProps) {
   const [copied, setCopied] = useState(false)
 
   const handleCopy = async () => {
-    await navigator.clipboard.writeText(`${post.content}\n\n${post.hashtags.join(' ')}`)
+    const hashtagsWithSymbol = post.hashtags.map(tag => `#${tag}`).join(' ')
+    await navigator.clipboard.writeText(`${post.content}\n\n${hashtagsWithSymbol}`)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }
